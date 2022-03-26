@@ -6,9 +6,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
-import pl.fc.invoicing.dto.InvoiceDto
+import pl.fc.invoicing.dto.CompanyDto
+import pl.fc.invoicing.dto.CompanyListDto
 import pl.fc.invoicing.helpers.TestHelpers
-import pl.fc.invoicing.model.Invoice
 import pl.fc.invoicing.services.JsonService
 import spock.lang.Specification
 
@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class InvoiceControllerTest extends Specification {
+class CompanyControllerTest extends Specification {
 
     @Autowired
     private MockMvc mockMvc
@@ -25,25 +25,22 @@ class InvoiceControllerTest extends Specification {
     @Autowired
     private JsonService jsonService
 
-    private InvoiceDto invoiceDto1 = TestHelpers.invoiceDto(1)
-    private InvoiceDto invoiceDto2 = TestHelpers.invoiceDto(3)
-    private InvoiceDto invoiceDto3 = TestHelpers.invoiceDto(5)
+    private CompanyDto companyDto = TestHelpers.companyDto(1)
 
     def setup() {
-            mockMvc.perform(get("/invoice/deleteAll"))
-                    .andExpect(status().isNoContent())
-                    .andReturn()
-                    .response
-                    .contentAsString
-
+        mockMvc.perform(get("/company/deleteAll"))
+                .andExpect(status().isNoContent())
+                .andReturn()
+                .response
+                .contentAsString
     }
 
-    private InvoiceDto saveInvoiceDto(InvoiceDto invoiceDto) {
+    private CompanyDto saveCompanyDto(CompanyDto companyDto) {
         String result = null
 
         try {
-            result = mockMvc.perform(post("/invoice")
-                    .content(jsonService.toJson(invoiceDto))
+            result = mockMvc.perform(post("/company")
+                    .content(jsonService.toJson(companyDto))
                     .contentType(MediaType.APPLICATION_JSON)
             )
                     .andExpect(status().isOk())
@@ -54,40 +51,39 @@ class InvoiceControllerTest extends Specification {
             e.printStackTrace()
         }
 
-        InvoiceDto invoice1 = null
+        CompanyDto company1 = null
         try {
-            invoice1 = jsonService.toObject(result, InvoiceDto)
+            company1 = jsonService.toObject(result, CompanyDto)
         } catch (JsonProcessingException e) {
             e.printStackTrace()
         }
-        return invoice1
+        return company1
     }
 
-    private List<Invoice> getAllInvoices() {
-        def result = mockMvc.perform(get("/invoice"))
+    private List<CompanyListDto> getAllCompanies() {
+        def result = mockMvc.perform(get("/company"))
                 .andExpect(status().isOk())
                 .andReturn()
                 .response
                 .contentAsString
 
-        return jsonService.toObject(result, Invoice[])
+        return jsonService.toObject(result, CompanyDto[])
     }
 
     def "Save"() {
         given:
-        def invoice1 = saveInvoiceDto(invoiceDto1)
+        def company = saveCompanyDto(companyDto)
 
         expect:
-        invoice1.getNumber() == "FA/1"
-        invoice1.getEntries().get(0).getCarRelatedExpense().getRegistrationNumber() == "DW 5G881"
+        company.getName() == "Abra 1"
     }
 
     def "GetById"() {
         given:
-        def invoice1 = saveInvoiceDto(invoiceDto1)
+        def company = saveCompanyDto(companyDto)
 
         when:
-        def result = mockMvc.perform(get("/invoice/" + invoice1.getInvoiceId()))
+        def result = mockMvc.perform(get("/company/" + company.getCompanyId()))
                 .andExpect(status().isOk())
                 .andReturn()
                 .response
@@ -99,22 +95,20 @@ class InvoiceControllerTest extends Specification {
 
     def "GetAll"() {
         given:
-        saveInvoiceDto(invoiceDto1)
-        saveInvoiceDto(invoiceDto2)
-        saveInvoiceDto(invoiceDto3)
+        saveCompanyDto(companyDto)
 
         expect:
-        getAllInvoices().size() == 3
+        getAllCompanies().size() == 1
     }
 
     def "Update"() {
         given:
-        def invoice1 = saveInvoiceDto(invoiceDto1)
-        invoice1.setNumber("FA/15")
+        def company = saveCompanyDto(companyDto)
+        company.setName("Company 1")
 
         when:
-        def result = mockMvc.perform(patch("/invoice/" + invoice1.getInvoiceId())
-                .content(jsonService.toJson(invoice1))
+        def result = mockMvc.perform(patch("/company/" + company.getCompanyId())
+                .content(jsonService.toJson(company))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
         )
                 .andExpect(status().isOk())
@@ -123,17 +117,17 @@ class InvoiceControllerTest extends Specification {
                 .contentAsString
 
         then:
-        result.contains("FA/15")
+        result.contains("Company 1")
     }
 
     def "Delete"() {
         given:
-        def invoice1 = saveInvoiceDto(invoiceDto1)
+        def company = saveCompanyDto(companyDto)
 
         when:
-        mockMvc.perform(delete("/invoice/" + invoice1.getInvoiceId()))
+        mockMvc.perform(delete("/company/" + company.getCompanyId()))
 
         then:
-        getAllInvoices().size() == 0
+        getAllCompanies().size() == 0
     }
 }

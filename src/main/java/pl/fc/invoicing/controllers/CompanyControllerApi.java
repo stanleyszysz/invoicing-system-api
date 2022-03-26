@@ -35,4 +35,8 @@ public interface CompanyControllerApi {
     @DeleteMapping(path = "/{id}")
     @Operation(summary = "Delete company", description = "Delete company selected by id")
     ResponseEntity<Void> delete(@PathVariable UUID id);
+
+    @GetMapping(path = "/deleteAll")
+    @Operation(summary = "Delete all companies", description = "Delete all companies")
+    ResponseEntity<Void> deleteAll();
 }

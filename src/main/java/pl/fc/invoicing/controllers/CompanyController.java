@@ -19,7 +19,7 @@ import pl.fc.invoicing.services.CompanyService;
 @RestController
 @RequestMapping(path = "/company", produces = {"application/json;charset=UTF-8"})
 @RequiredArgsConstructor
-public class CompanyContoller implements CompanyControllerApi {
+public class CompanyController implements CompanyControllerApi {
 
     private final CompanyService companyService;
 
@@ -36,7 +36,6 @@ public class CompanyContoller implements CompanyControllerApi {
     }
 
     @Override
-    //    public ResponseEntity<List<CompanyListDto>> list(@RequestParam Pageable pageable) {
     public ResponseEntity<List<CompanyListDto>> getAll() {
         log.debug("Getting list of all invoice");
         return ResponseEntity.ok(companyService.getAll());
@@ -57,6 +56,12 @@ public class CompanyContoller implements CompanyControllerApi {
             return ResponseEntity.status(204).build();
         }
         log.debug("Cannot delete invoice by id: " + id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteAll() {
+        companyService.clear();
         return ResponseEntity.noContent().build();
     }
 }

@@ -4,14 +4,16 @@ server:
 debug: false
 logging:
   level:
-    ROOT: DEBUG
+    ROOT: INFO
     org:
       springframework:
-        boot: DEBUG
+        boot: INFO
+      hibernate:
+        type: trace
     pl:
       fc:
-        invoicing: DEBUG
-        invoicing.db: DEBUG
+        invoicing: INFO
+        invoicing.db: INFO
 
 springdoc:
   swagger-ui:

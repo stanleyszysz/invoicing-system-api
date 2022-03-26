@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import pl.fc.invoicing.dto.InvoiceDto;
 import pl.fc.invoicing.dto.InvoiceListDto;
@@ -19,11 +20,14 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
 
+    private final ModelMapper modelMapper = new ModelMapper();
+
     @Override
-    public InvoiceDto save(InvoiceDto invoice) {
-        Invoice invoiceModel = new Invoice(invoice);
+    public InvoiceDto save(InvoiceDto invoiceDto) {
+        Invoice invoiceModel = modelMapper.map(invoiceDto, Invoice.class);
+        invoiceModel.updateRelations();
         Invoice savedInvoice = invoiceRepository.save(invoiceModel);
-        return new InvoiceDto(savedInvoice);
+        return modelMapper.map(savedInvoice, InvoiceDto.class);
     }
 
     @Override
@@ -32,7 +36,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         if (invoice.isEmpty()) {
             return Optional.empty();
         } else {
-            return Optional.of(new InvoiceDto(invoice.get()));
+            InvoiceDto foundInvoiceDto = modelMapper.map(invoice.get(), InvoiceDto.class);
+            return Optional.of(foundInvoiceDto);
         }
     }
 
@@ -40,17 +45,22 @@ public class InvoiceServiceImpl implements InvoiceService {
     public List<InvoiceListDto> getAll() {
         return invoiceRepository.findAll().stream().map(item ->
             InvoiceListDto.builder()
-                // .dateAt(item.getDateAt())
+                .invoiceId(item.getInvoiceId())
+                .dateAt(item.getDateAt())
                 .number(item.getNumber())
+                .seller(item.getSeller())
+                .buyer(item.getBuyer())
+                .entries(item.getEntries())
                 .build()).collect(Collectors.toList());
     }
 
     @Override
     public InvoiceDto update(UUID id, InvoiceDto updatedInvoice) {
         if (invoiceRepository.findById(id).isPresent()) {
-            updatedInvoice.setInvoiceId(id);
-            Invoice invoiceModel = new Invoice(updatedInvoice);
-            invoiceRepository.save(invoiceModel);
+            Invoice invoice = invoiceRepository.findById(id).get();
+            invoice.updateFromDto(updatedInvoice);
+            invoice.updateRelations();
+            invoiceRepository.save(invoice);
             return updatedInvoice;
         } else {
             throw new NoSuchElementException("Invoice with id: " + id + " doesn't exist.");
@@ -59,10 +69,11 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public void delete(UUID id) {
-        if (invoiceRepository.findById(id).isPresent()) {
             invoiceRepository.deleteById(id);
-        } else {
-            throw new NoSuchElementException("Invoice with id: " + id + " doesn't exist.");
-        }
+    }
+
+    @Override
+    public void clear() {
+        invoiceRepository.deleteAll();
     }
 }

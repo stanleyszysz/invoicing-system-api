@@ -60,10 +60,11 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public void delete(UUID id) {
-        if (companyRepository.findById(id).isPresent()) {
-            companyRepository.deleteById(id);
-        } else {
-            throw new NoSuchElementException("Company with id: " + id + " doesn't exist.");
-        }
+        companyRepository.deleteById(id);
+    }
+
+    @Override
+    public void clear() {
+        companyRepository.deleteAll();
     }
 }

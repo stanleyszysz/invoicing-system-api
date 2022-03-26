@@ -2,6 +2,7 @@ package pl.fc.invoicing.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.math.BigDecimal;
 import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -39,22 +40,23 @@ public class Company {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")
     @JsonManagedReference
-//    @JsonIgnore
     private Address address;
 
-    //    @Builder.Default
-    //    @Schema(description = "Pension insurance amount", example = "1000.00", required = true)
-    //    private BigDecimal pensionInsurance = BigDecimal.ZERO;
+    @Builder.Default
+    @Schema(description = "Pension insurance amount", example = "1000.00", required = true)
+    private BigDecimal pensionInsurance = BigDecimal.ZERO;
 
-    //    @Builder.Default
-    //    @Schema(description = "Health insurance amount", example = "500.00", required = true)
-    //    private BigDecimal healthInsurance = BigDecimal.ZERO;
+    @Builder.Default
+    @Schema(description = "Health insurance amount", example = "500.00", required = true)
+    private BigDecimal healthInsurance = BigDecimal.ZERO;
 
     public Company(CompanyDto companyDto) {
         this.companyId = companyDto.getCompanyId();
         this.taxIdentifier = companyDto.getTaxIdentifier();
         this.name = companyDto.getName();
         this.address = companyDto.getAddress();
+        this.pensionInsurance = companyDto.getPensionInsurance();
+        this.healthInsurance = companyDto.getHealthInsurance();
     }
 
 }

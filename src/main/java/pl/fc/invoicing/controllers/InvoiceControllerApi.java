@@ -35,4 +35,8 @@ public interface InvoiceControllerApi {
     @DeleteMapping(path = "/{id}")
     @Operation(summary = "Delete invoice", description = "Delete invoice selected by id")
     ResponseEntity<Void> delete(@PathVariable UUID id);
+
+    @GetMapping(path = "/deleteAll")
+    @Operation(summary = "Delete all invoice", description = "Delete all invoice")
+    ResponseEntity<Void> deleteAll();
 }

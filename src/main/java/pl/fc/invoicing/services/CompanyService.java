@@ -12,10 +12,11 @@ public interface CompanyService {
 
     Optional<CompanyDto> getById(UUID id);
 
-    //    List<CompanyListDto> getAll(Pageable pageable);
     List<CompanyListDto> getAll();
 
     CompanyDto update(UUID id, CompanyDto updatedCompany);
 
     void delete(UUID id);
+
+    void clear();
 }

@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.fc.invoicing.dto.InvoiceDto;
 import pl.fc.invoicing.dto.InvoiceListDto;
-import pl.fc.invoicing.model.Invoice;
 import pl.fc.invoicing.services.InvoiceService;
 
 @Slf4j
@@ -22,6 +22,7 @@ import pl.fc.invoicing.services.InvoiceService;
 @RequiredArgsConstructor
 public class InvoiceController implements InvoiceControllerApi {
 
+    @Autowired
     private final InvoiceService invoiceService;
 
     @Override
@@ -29,12 +30,6 @@ public class InvoiceController implements InvoiceControllerApi {
         log.debug("Adding new invoice");
         return ResponseEntity.ok(invoiceService.save(invoice));
     }
-
-//    @Override
-//    public ResponseEntity<Invoice> save(@RequestBody Invoice invoice) {
-//        log.debug("Adding new invoice");
-//        return ResponseEntity.ok(invoiceService.save(invoice));
-//    }
 
     @Override
     public ResponseEntity<Optional<InvoiceDto>> getById(@PathVariable UUID id) {
@@ -63,6 +58,12 @@ public class InvoiceController implements InvoiceControllerApi {
             return ResponseEntity.status(204).build();
         }
         log.debug("Cannot delete invoice by id: " + id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteAll() {
+        invoiceService.clear();
         return ResponseEntity.noContent().build();
     }
 }
