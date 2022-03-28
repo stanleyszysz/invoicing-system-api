@@ -2,9 +2,12 @@ package pl.fc.invoicing.services;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.fc.invoicing.dto.CompanyDto;
+import pl.fc.invoicing.dto.InvoiceDto;
 import pl.fc.invoicing.model.InvoiceEntry;
 import pl.fc.invoicing.model.TaxCalculatorResult;
 
@@ -14,13 +17,21 @@ public class TaxCalculatorService {
 
     private final InvoiceService invoiceService;
 
+    private BigDecimal visitStream(Predicate<InvoiceDto> invoiceDto, Function<InvoiceEntry, BigDecimal> invoiceEntryToAmount) {
+        return invoiceService.getAll().stream()
+            .filter(invoiceDto)
+            .flatMap(i -> i.getEntries().stream())
+            .map(invoiceEntryToAmount)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
     public BigDecimal income(String taxIdentificationNumber) {
-        return invoiceService.visitStream(invoice -> invoice.getSeller().getTaxIdentifier().equals(taxIdentificationNumber),
+        return visitStream(invoice -> invoice.getSeller().getTaxIdentifier().equals(taxIdentificationNumber),
             InvoiceEntry::getPrice);
     }
 
     public BigDecimal costs(String taxIdentificationNumber) {
-        return invoiceService.visitStream(invoice -> invoice.getBuyer().getTaxIdentifier().equals(taxIdentificationNumber),
+        return visitStream(invoice -> invoice.getBuyer().getTaxIdentifier().equals(taxIdentificationNumber),
             this::getIncomeValueAccordingToPersonalCarUsage);
     }
 
@@ -35,12 +46,12 @@ public class TaxCalculatorService {
     }
 
     public BigDecimal incomingVat(String taxIdentificationNumber) {
-        return invoiceService.visitStream(invoice -> invoice.getSeller().getTaxIdentifier().equals(taxIdentificationNumber),
+        return visitStream(invoice -> invoice.getSeller().getTaxIdentifier().equals(taxIdentificationNumber),
             InvoiceEntry::getVatValue);
     }
 
     public BigDecimal outgoingVat(String taxIdentificationNumber) {
-        return invoiceService.visitStream(invoice -> invoice.getBuyer().getTaxIdentifier().equals(taxIdentificationNumber),
+        return visitStream(invoice -> invoice.getBuyer().getTaxIdentifier().equals(taxIdentificationNumber),
             this::getVatValueAccordingToPersonalCarUsage);
     }
 

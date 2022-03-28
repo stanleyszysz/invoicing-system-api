@@ -50,13 +50,15 @@ public class Company {
     @Schema(description = "Health insurance amount", example = "500.00", required = true)
     private BigDecimal healthInsurance = BigDecimal.ZERO;
 
-    public Company(CompanyDto companyDto) {
-        this.companyId = companyDto.getCompanyId();
-        this.taxIdentifier = companyDto.getTaxIdentifier();
-        this.name = companyDto.getName();
-        this.address = companyDto.getAddress();
-        this.pensionInsurance = companyDto.getPensionInsurance();
-        this.healthInsurance = companyDto.getHealthInsurance();
+    public static Company of(CompanyDto companyDto) {
+        Company company = new Company();
+        company.companyId = companyDto.getCompanyId();
+        company.taxIdentifier = companyDto.getTaxIdentifier();
+        company.name = companyDto.getName();
+        company.address = companyDto.getAddress();
+        company.pensionInsurance = companyDto.getPensionInsurance();
+        company.healthInsurance = companyDto.getHealthInsurance();
+        return company;
     }
 
 }

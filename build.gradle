@@ -8,6 +8,7 @@ buildscript {
 		lombokVersion = "1.18.22"
 		springDocVersion = "1.6.6"
 		spockVersion = "2.1-groovy-3.0"
+		mapstruckVersion = "1.4.2.Final"
 	}
 }
 
@@ -54,6 +55,7 @@ dependencies {
 	implementation "com.h2database:h2:${h2Version}"
 	implementation 'org.modelmapper:modelmapper:3.1.0'
 	implementation "org.flywaydb:flyway-core:${flywayVersion}"
+	implementation "org.mapstruct:mapstruct:${mapstruckVersion}"
 
 	runtimeOnly "org.postgresql:postgresql:${postgresqlVersion}"
 

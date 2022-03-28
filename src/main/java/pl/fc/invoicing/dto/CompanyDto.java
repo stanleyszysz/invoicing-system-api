@@ -22,13 +22,14 @@ public class CompanyDto {
     private BigDecimal pensionInsurance;
     private BigDecimal healthInsurance;
 
-    public CompanyDto(Company company) {
-        this.companyId = company.getCompanyId();
-        this.taxIdentifier = company.getTaxIdentifier();
-        this.name = company.getName();
-        this.address = company.getAddress();
-        this.pensionInsurance = company.getPensionInsurance();
-        this.healthInsurance = company.getHealthInsurance();
-
+    public static CompanyDto of(Company company) {
+        CompanyDto companyDto = new CompanyDto();
+        companyDto.companyId = company.getCompanyId();
+        companyDto.taxIdentifier = company.getTaxIdentifier();
+        companyDto.name = company.getName();
+        companyDto.address = company.getAddress();
+        companyDto.pensionInsurance = company.getPensionInsurance();
+        companyDto.healthInsurance = company.getHealthInsurance();
+        return companyDto;
     }
 }

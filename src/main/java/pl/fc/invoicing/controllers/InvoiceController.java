@@ -40,7 +40,8 @@ public class InvoiceController implements InvoiceControllerApi {
     @Override
     public ResponseEntity<List<InvoiceListDto>> getAll() {
         log.debug("Getting list of all invoice");
-        return ResponseEntity.ok(invoiceService.getAll());
+        return ResponseEntity.ok(invoiceService.getAll().stream().map(invoiceDto ->
+            InvoiceListDto.of(invoiceDto)).toList());
     }
 
     @Override

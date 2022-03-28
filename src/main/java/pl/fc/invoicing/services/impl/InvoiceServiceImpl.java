@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import pl.fc.invoicing.dto.InvoiceDto;
-import pl.fc.invoicing.dto.InvoiceListDto;
 import pl.fc.invoicing.model.Invoice;
 import pl.fc.invoicing.repositories.InvoiceRepository;
 import pl.fc.invoicing.services.InvoiceService;
@@ -42,10 +41,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public List<InvoiceListDto> getAll() {
+    public List<InvoiceDto> getAll() {
         return invoiceRepository.findAll().stream().map(item ->
-            InvoiceListDto.builder()
-                .invoiceId(item.getInvoiceId())
+            InvoiceDto.builder()
+                // .invoiceId(item.getInvoiceId())
                 .dateAt(item.getDateAt())
                 .number(item.getNumber())
                 .seller(item.getSeller())

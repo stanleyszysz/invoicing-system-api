@@ -21,9 +21,9 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public CompanyDto save(CompanyDto company) {
-        Company companyModel = new Company(company);
+        Company companyModel = Company.of(company);
         Company savedCompany = companyRepository.save(companyModel);
-        return new CompanyDto(savedCompany);
+        return CompanyDto.of(savedCompany);
     }
 
     @Override
@@ -32,7 +32,7 @@ public class CompanyServiceImpl implements CompanyService {
         if (company.isEmpty()) {
             return Optional.empty();
         } else {
-            return Optional.of(new CompanyDto(company.get()));
+            return Optional.of(CompanyDto.of(company.get()));
         }
 
     }
@@ -50,7 +50,7 @@ public class CompanyServiceImpl implements CompanyService {
     public CompanyDto update(UUID id, CompanyDto updatedCompany) {
         if (companyRepository.findById(id).isPresent()) {
             updatedCompany.setCompanyId(id);
-            Company companyModel = new Company(updatedCompany);
+            Company companyModel = Company.of(updatedCompany);
             companyRepository.save(companyModel);
             return updatedCompany;
         } else {
