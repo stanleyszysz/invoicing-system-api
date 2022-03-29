@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.fc.invoicing.dto.CompanyDto;
 import pl.fc.invoicing.dto.CompanyListDto;
+import pl.fc.invoicing.exceptions.handlers.IdNotFoundException;
 import pl.fc.invoicing.model.Company;
 import pl.fc.invoicing.repositories.CompanyRepository;
 import pl.fc.invoicing.services.CompanyService;
@@ -29,10 +30,10 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public Optional<CompanyDto> getById(UUID id) {
         Optional<Company> company = companyRepository.findById(id);
-        if (company.isEmpty()) {
-            return Optional.empty();
-        } else {
+        if (company.isPresent()) {
             return Optional.of(CompanyDto.of(company.get()));
+        } else {
+            throw new IdNotFoundException("Company id: " + id + " not found.");
         }
 
     }

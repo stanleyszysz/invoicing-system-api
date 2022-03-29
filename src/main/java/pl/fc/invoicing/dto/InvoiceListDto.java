@@ -8,12 +8,8 @@ import lombok.Data;
 @Builder
 public class InvoiceListDto {
 
-    // private UUID invoiceId;
     private LocalDate dateAt;
     private String number;
-    // private Company seller;
-    // private Company buyer;
-    // private List<InvoiceEntry> entries;
 
     public static InvoiceListDto of(InvoiceDto invoiceDto) {
         return new InvoiceListDto(invoiceDto.getDateAt(), invoiceDto.getNumber());

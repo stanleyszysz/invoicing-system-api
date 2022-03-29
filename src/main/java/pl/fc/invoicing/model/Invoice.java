@@ -19,7 +19,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
-import pl.fc.invoicing.dto.InvoiceDto;
 
 @Entity
 @Data
@@ -61,13 +60,4 @@ public class Invoice {
         }
     }
 
-    public void updateFromDto(InvoiceDto invoiceDto) {
-        this.dateAt = invoiceDto.getDateAt();
-        this.number = invoiceDto.getNumber();
-        this.seller = invoiceDto.getSeller();
-        this.buyer = invoiceDto.getBuyer();
-        this.entries = invoiceDto.getEntries();
-    }
-
 }
-

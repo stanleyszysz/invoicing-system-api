@@ -1,7 +1,6 @@
 package pl.fc.invoicing.controllers;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.fc.invoicing.dto.InvoiceDto;
 import pl.fc.invoicing.dto.InvoiceListDto;
+import pl.fc.invoicing.exceptions.handlers.IdNotFoundException;
 import pl.fc.invoicing.services.InvoiceService;
 
 @Slf4j
@@ -52,14 +52,13 @@ public class InvoiceController implements InvoiceControllerApi {
 
     @Override
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        try {
+        if (invoiceService.getById(id).isPresent()) {
             invoiceService.delete(id);
-        } catch (NoSuchElementException e) {
             log.debug("Deleting invoice by id: " + id);
             return ResponseEntity.status(204).build();
+        } else {
+            throw new IdNotFoundException("Company id: " + id + " not found.");
         }
-        log.debug("Cannot delete invoice by id: " + id);
-        return ResponseEntity.noContent().build();
     }
 
     @Override

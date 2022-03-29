@@ -6,9 +6,10 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import pl.fc.invoicing.dto.InvoiceDto;
+import pl.fc.invoicing.dto.mappers.InvoiceMapper;
+import pl.fc.invoicing.exceptions.handlers.IdNotFoundException;
 import pl.fc.invoicing.model.Invoice;
 import pl.fc.invoicing.repositories.InvoiceRepository;
 import pl.fc.invoicing.services.InvoiceService;
@@ -19,24 +20,24 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
 
-    private final ModelMapper modelMapper = new ModelMapper();
+    private final InvoiceMapper invoiceMapper;
 
     @Override
     public InvoiceDto save(InvoiceDto invoiceDto) {
-        Invoice invoiceModel = modelMapper.map(invoiceDto, Invoice.class);
+        Invoice invoiceModel = invoiceMapper.toEntity(invoiceDto);
         invoiceModel.updateRelations();
         Invoice savedInvoice = invoiceRepository.save(invoiceModel);
-        return modelMapper.map(savedInvoice, InvoiceDto.class);
+        return invoiceMapper.toDto(savedInvoice);
     }
 
     @Override
     public Optional<InvoiceDto> getById(UUID id) {
         Optional<Invoice> invoice = invoiceRepository.findById(id);
-        if (invoice.isEmpty()) {
-            return Optional.empty();
-        } else {
-            InvoiceDto foundInvoiceDto = modelMapper.map(invoice.get(), InvoiceDto.class);
+        if (invoice.isPresent()) {
+            InvoiceDto foundInvoiceDto = invoiceMapper.toDto(invoice.get());
             return Optional.of(foundInvoiceDto);
+        } else {
+            throw new IdNotFoundException("Invoice id: " + id + " not found.");
         }
     }
 
@@ -44,7 +45,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     public List<InvoiceDto> getAll() {
         return invoiceRepository.findAll().stream().map(item ->
             InvoiceDto.builder()
-                // .invoiceId(item.getInvoiceId())
                 .dateAt(item.getDateAt())
                 .number(item.getNumber())
                 .seller(item.getSeller())
@@ -56,8 +56,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public InvoiceDto update(UUID id, InvoiceDto updatedInvoice) {
         if (invoiceRepository.findById(id).isPresent()) {
-            Invoice invoice = invoiceRepository.findById(id).get();
-            invoice.updateFromDto(updatedInvoice);
+            Invoice invoice = invoiceMapper.toEntity(updatedInvoice);
             invoice.updateRelations();
             invoiceRepository.save(invoice);
             return updatedInvoice;
