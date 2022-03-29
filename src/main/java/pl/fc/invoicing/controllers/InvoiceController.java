@@ -33,8 +33,13 @@ public class InvoiceController implements InvoiceControllerApi {
 
     @Override
     public ResponseEntity<Optional<InvoiceDto>> getById(@PathVariable UUID id) {
-        log.debug("Getting invoice by id: " + id);
-        return ResponseEntity.ok(invoiceService.getById(id));
+        try {
+            log.debug("Getting invoice by id: " + id);
+            return ResponseEntity.ok(invoiceService.getById(id));
+        } catch (Exception e) {
+            throw new IdNotFoundException("Invoice id: " + id + " not found.");
+        }
+
     }
 
     @Override

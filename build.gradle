@@ -57,6 +57,7 @@ dependencies {
 	implementation 'org.modelmapper:modelmapper:3.1.0'
 	implementation "org.flywaydb:flyway-core:${flywayVersion}"
 	implementation "org.mapstruct:mapstruct:${mapstrucktVersion}"
+	implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
 	runtimeOnly "org.postgresql:postgresql:${postgresqlVersion}"
 

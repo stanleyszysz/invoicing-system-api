@@ -8,10 +8,12 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import pl.fc.invoicing.dto.CompanyDto
 import pl.fc.invoicing.dto.CompanyListDto
+import pl.fc.invoicing.exceptions.handlers.IdNotFoundException
 import pl.fc.invoicing.helpers.TestHelpers
 import pl.fc.invoicing.services.JsonService
 import spock.lang.Specification
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -93,6 +95,17 @@ class CompanyControllerTest extends Specification {
         result.contains("Abra 1")
     }
 
+    def "GetById not found"() {
+        when:
+        def result = mockMvc.perform(get("/company/91d48c95-b90b-4d0b-9409-9ff158890bc4"))
+                .andReturn()
+                .response
+                .contentAsString
+
+        then:
+        result.contains("Company id: 91d48c95-b90b-4d0b-9409-9ff158890bc4 not found.")
+    }
+
     def "GetAll"() {
         given:
         saveCompanyDto(companyDto)
@@ -129,5 +142,16 @@ class CompanyControllerTest extends Specification {
 
         then:
         getAllCompanies().size() == 0
+    }
+
+    def "Return message when id not found"() {
+        when:
+        def result = mockMvc.perform(delete("/company/91d48c95-b90b-4d0b-9409-9ff158890bc4"))
+                .andReturn()
+                .response
+                .contentAsString
+
+        then:
+        result.contains("Company id: 91d48c95-b90b-4d0b-9409-9ff158890bc4 not found.")
     }
 }

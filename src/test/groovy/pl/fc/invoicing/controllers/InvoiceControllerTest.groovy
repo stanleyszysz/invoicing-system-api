@@ -97,6 +97,17 @@ class InvoiceControllerTest extends Specification {
         result.contains("Abra 1")
     }
 
+    def "GetById not found"() {
+        when:
+        def result = mockMvc.perform(get("/invoice/91d48c95-b90b-4d0b-9409-9ff158890bc4"))
+                .andReturn()
+                .response
+                .contentAsString
+
+        then:
+        result.contains("Invoice id: 91d48c95-b90b-4d0b-9409-9ff158890bc4 not found.")
+    }
+
     def "GetAll"() {
         given:
         saveInvoiceDto(invoiceDto1)
@@ -135,5 +146,16 @@ class InvoiceControllerTest extends Specification {
 
         then:
         getAllInvoices().size() == 0
+    }
+
+    def "Return message when id not found"() {
+        when:
+        def result = mockMvc.perform(delete("/invoice/91d48c95-b90b-4d0b-9409-9ff158890bc4"))
+                .andReturn()
+                .response
+                .contentAsString
+
+        then:
+        result.contains("Invoice id: 91d48c95-b90b-4d0b-9409-9ff158890bc4 not found.")
     }
 }

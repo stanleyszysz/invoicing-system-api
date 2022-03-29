@@ -1,7 +1,6 @@
 package pl.fc.invoicing.services.impl;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -61,7 +60,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             invoiceRepository.save(invoice);
             return updatedInvoice;
         } else {
-            throw new NoSuchElementException("Invoice with id: " + id + " doesn't exist.");
+            throw new IdNotFoundException("Invoice id: " + id + " not found.");
         }
     }
 

@@ -2,28 +2,32 @@ package pl.fc.invoicing.exceptions.handlers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
 
 @ControllerAdvice
 public class ControllerExceptionHandler {
 
-    @ExceptionHandler(IdNotFoundException.class)
-    public ResponseEntity<ErrorMessage> idNotFoundException(IdNotFoundException ex, WebRequest request) {
-        ErrorMessage message = new ErrorMessage(
-            HttpStatus.NOT_FOUND.value(),
-            ex.getMessage());
-
-        return new ResponseEntity<ErrorMessage>(message, HttpStatus.NOT_FOUND);
+    @ExceptionHandler({
+        IdNotFoundException.class
+    })
+    @Nullable
+    public final ResponseEntity<String> handleException(Exception ex) {
+        if (ex instanceof IdNotFoundException) {
+            HttpStatus status = HttpStatus.NOT_FOUND;
+            IdNotFoundException infe = (IdNotFoundException) ex;
+            return idNotFoundException(infe, status);
+        } else {
+            return globalExceptionHandler(ex);
+        }
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorMessage> globalExceptionHandler(Exception ex, WebRequest request) {
-        ErrorMessage message = new ErrorMessage(
-            HttpStatus.INTERNAL_SERVER_ERROR.value(),
-            ex.getMessage());
+    public ResponseEntity<String> idNotFoundException(IdNotFoundException ex, HttpStatus status) {
+        return new ResponseEntity<>(ex.getMessage(), status);
+    }
 
-        return new ResponseEntity<ErrorMessage>(message, HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<String> globalExceptionHandler(Exception ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -1,7 +1,6 @@
 package pl.fc.invoicing.services.impl;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -35,7 +34,6 @@ public class CompanyServiceImpl implements CompanyService {
         } else {
             throw new IdNotFoundException("Company id: " + id + " not found.");
         }
-
     }
 
     @Override   
@@ -55,7 +53,7 @@ public class CompanyServiceImpl implements CompanyService {
             companyRepository.save(companyModel);
             return updatedCompany;
         } else {
-            throw new NoSuchElementException("Company with id: " + id + " doesn't exist.");
+            throw new IdNotFoundException("Company id: " + id + " not found.");
         }
     }
 

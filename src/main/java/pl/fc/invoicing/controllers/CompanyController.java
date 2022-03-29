@@ -31,8 +31,12 @@ public class CompanyController implements CompanyControllerApi {
 
     @Override
     public ResponseEntity<Optional<CompanyDto>> getById(@PathVariable UUID id) {
-        log.debug("Getting invoice by id: " + id);
-        return ResponseEntity.ok(companyService.getById(id));
+        try {
+            log.debug("Getting company by id: " + id);
+            return ResponseEntity.ok(companyService.getById(id));
+        } catch (Exception e) {
+            throw new IdNotFoundException("Company id: " + id + " not found.");
+        }
     }
 
     @Override
@@ -48,7 +52,7 @@ public class CompanyController implements CompanyControllerApi {
     }
 
     @Override
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    public ResponseEntity<Void> delete(@PathVariable UUID id) throws IdNotFoundException {
         if (companyService.getById(id).isPresent()) {
             companyService.delete(id);
             log.debug("Deleting invoice by id: " + id);
