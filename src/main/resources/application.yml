@@ -1,0 +1,29 @@
+server:
+  port: 8099
+
+debug: false
+logging:
+  level:
+    ROOT: INFO
+    org:
+      springframework:
+        boot: INFO
+      hibernate:
+        type: trace
+    pl:
+      fc:
+        invoicing: INFO
+        invoicing.db: INFO
+
+springdoc:
+  swagger-ui:
+    enabled: true
+
+spring:
+  profiles:
+    active: jpa
+  flyway:
+    enabled: false
+  output:
+    ansi:
+      enabled: ALWAYS

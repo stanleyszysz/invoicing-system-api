@@ -1,12 +1,36 @@
+buildscript {
+	ext {
+		postgresqlVersion = "42.3.3"
+		flywayVersion = "8.5.2"
+		h2Version = '2.1.210'
+		junitVersion = "4.13.2"
+		groovyVersion = "3.0.10"
+		lombokVersion = "1.18.22"
+		springDocVersion = "1.6.6"
+		spockVersion = "2.1-groovy-3.0"
+		mapstrucktVersion = "1.4.2.Final"
+	}
+}
+
 plugins {
 	id 'org.springframework.boot' version '2.6.4'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id 'groovy'
+	id 'application'
+	id 'checkstyle'
+	id 'jacoco'
+}
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+		vendor = JvmVendorSpec.ADOPTOPENJDK
+	}
 }
 
 group = 'pl.fc'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+version = '0.0.1'
 
 configurations {
 	compileOnly {
@@ -19,14 +43,77 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstrucktVersion}"
+
+	compileOnly "org.projectlombok:lombok:${lombokVersion}"
+
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'org.postgresql:postgresql'
-	annotationProcessor 'org.projectlombok:lombok'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation "org.springdoc:springdoc-openapi-ui:${springDocVersion}"
+	implementation "com.h2database:h2:${h2Version}"
+	implementation 'org.modelmapper:modelmapper:3.1.0'
+	implementation "org.flywaydb:flyway-core:${flywayVersion}"
+	implementation "org.mapstruct:mapstruct:${mapstrucktVersion}"
+	implementation 'com.google.code.findbugs:jsr305:3.0.2'
+
+	runtimeOnly "org.postgresql:postgresql:${postgresqlVersion}"
+
+	testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+	testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+
+	testImplementation "com.h2database:h2:${h2Version}"
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation "org.codehaus.groovy:groovy:${groovyVersion}"
+	testImplementation "org.spockframework:spock-core:${spockVersion}"
+	testImplementation "org.spockframework:spock-spring:${spockVersion}"
+	testImplementation "junit:junit:${junitVersion}"
+}
+
+application {
+	mainClass = 'pl.fc.invoicing.InvoicingSystemApiApplication'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+checkstyle {
+	showViolations = true
+	ignoreFailures = false
+	maxWarnings = 0
+	maxErrors = 0
+}
+
+test {
+	finalizedBy jacocoTestReport
+	finalizedBy jacocoTestCoverageVerification
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required = false
+		csv.required = false
+		html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+	}
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				minimum = 0.7
+			}
+		}
+	}
+
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: 'pl/futurecollars/invoicing/InvoicingSystemApiApplication.class')
+		}))
+	}
 }
