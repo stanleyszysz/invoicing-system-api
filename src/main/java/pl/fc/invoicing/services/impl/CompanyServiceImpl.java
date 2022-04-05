@@ -42,6 +42,9 @@ public class CompanyServiceImpl implements CompanyService {
             CompanyListDto.builder()
                 .taxIdentifier(item.getTaxIdentifier())
                 .name(item.getName())
+                .address(item.getAddress())
+                .pensionInsurance(item.getPensionInsurance())
+                .healthInsurance(item.getHealthInsurance())
                 .build()).collect(Collectors.toList());
     }
 
