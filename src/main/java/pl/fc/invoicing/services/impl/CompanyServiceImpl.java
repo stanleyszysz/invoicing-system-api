@@ -40,6 +40,7 @@ public class CompanyServiceImpl implements CompanyService {
     public List<CompanyListDto> getAll() {
         return companyRepository.findAll().stream().map(item ->
             CompanyListDto.builder()
+                .companyId(item.getCompanyId())
                 .taxIdentifier(item.getTaxIdentifier())
                 .name(item.getName())
                 .address(item.getAddress())

@@ -1,6 +1,7 @@
 package pl.fc.invoicing.dto;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Data;
 import pl.fc.invoicing.model.Address;
@@ -9,6 +10,7 @@ import pl.fc.invoicing.model.Address;
 @Builder
 public class CompanyListDto {
 
+    private UUID companyId;
     private String taxIdentifier;
     private String name;
     private Address address;

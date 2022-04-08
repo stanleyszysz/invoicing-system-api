@@ -44,6 +44,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     public List<InvoiceDto> getAll() {
         return invoiceRepository.findAll().stream().map(item ->
             InvoiceDto.builder()
+                .invoiceId(item.getInvoiceId())
                 .dateAt(item.getDateAt())
                 .number(item.getNumber())
                 .seller(item.getSeller())

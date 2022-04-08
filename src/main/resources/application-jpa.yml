@@ -1,17 +1,32 @@
+# spring:
+#   jpa:
+#     hibernate:
+#       ddl-auto: update
+#     properties:
+#       hibernate:
+#         dialect: org.hibernate.dialect.PostgreSQLDialect
+#         show_sql: true
+#         format_sql: true
+#   datasource:
+#     url: jdbc:postgresql://localhost:5432/invoicing
+#     username: postgres
+#     password: pass1234
+#     driver-class-name: org.postgresql.Driver
+#   flyway:
+#     enabled: false
+
 spring:
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        show_sql: true
-        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
   datasource:
-    url: jdbc:postgresql://localhost:5432/invoicing
-    username: postgres
-    password: pass1234
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:h2:mem:mydb;MODE=PostgreSQL
+    username: sa
+    password:
+    driverClassName: org.h2.Driver
   flyway:
     enabled: false
 
