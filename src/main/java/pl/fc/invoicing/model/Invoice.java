@@ -39,12 +39,12 @@ public class Invoice {
     @Schema(description = "Invoice number", example = "2022/02/17/001", required = true)
     private String number;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "seller")
     @Schema(description = "Seller", required = true)
     private Company seller;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "buyer")
     @Schema(description = "Buyer", required = true)
     private Company buyer;

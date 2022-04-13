@@ -3,6 +3,7 @@ package pl.fc.invoicing.helpers
 import org.modelmapper.ModelMapper
 import pl.fc.invoicing.dto.CompanyDto
 import pl.fc.invoicing.dto.InvoiceDto
+import pl.fc.invoicing.dto.InvoiceToSaveDto
 import pl.fc.invoicing.model.*
 
 import java.time.LocalDate
@@ -42,18 +43,66 @@ class TestHelpers {
                 .description("Product $id")
                 .price(BigDecimal.valueOf(id * 1000))
                 .vatValue(BigDecimal.valueOf(id * 1000 * 0.23))
-                 .vatRate(Vat.VAT_23)
+                .vatRate(Vat.VAT_23)
                 .carRelatedExpense(car(1, false))
                 .build()
     }
 
-    static invoiceDto(int id) {
-        InvoiceDto.builder()
+    static invoiceToSaveDto(int id, String sellerTaxIdentifier, String buyerTaxIdentifier) {
+        InvoiceToSaveDto.builder()
                 .dateAt(LocalDate.now())
                 .number("FA/$id")
-                .seller(modelMapper.map(companyDto(id), Company.class))
-                .buyer(modelMapper.map(companyDto(id + 1), Company.class))
+                .sellerTaxIdentifier(sellerTaxIdentifier)
+                .buyerTaxIdentifier(buyerTaxIdentifier)
                 .entries((1..5).collect({ invoiceEntry(it) }))
                 .build()
+    }
+
+    // static invoiceDto(int id) {
+    //     InvoiceDto.builder()
+    //             .dateAt(LocalDate.now())
+    //             .number("FA/$id")
+    //             .seller(modelMapper.map(companyDto(id), Company.class))
+    //             .buyer(modelMapper.map(companyDto(id + 1), Company.class))
+    //             .entries((1..5).collect({ invoiceEntry(it) }))
+    //             .build()
+    // }
+
+    static checkIfAllFieldsNotNull(InvoiceDto invoiceDto) {
+        return invoiceDto.getInvoiceId() != null && invoiceDto.getDateAt() != null && invoiceDto.getNumber() != null && checkIfAllFieldsNotNull(invoiceDto.getSeller()) != null && checkIfAllFieldsNotNull(invoiceDto.getBuyer()) != null && checkIfAllFieldsNotNull(invoiceDto.getEntries()) != null
+    }
+
+    static checkIfAllInvoicesFieldsNotNull(List<InvoiceDto> invoiceDtos) {
+        for (invoice in invoiceDtos) {
+            if (!checkIfAllFieldsNotNull(invoice)) {
+                return false
+            }
+        }
+        return true
+    }
+
+    static checkIfAllFieldsNotNull(InvoiceEntry invoiceEntry) {
+        return invoiceEntry.getInvoiceEntryId() != null && invoiceEntry.getDescription() != null && invoiceEntry.getPrice() != null && invoiceEntry.getVatValue() != null && invoiceEntry.getVatRate() != null && checkIfAllFieldsNotNull(invoiceEntry.getCarRelatedExpense()) != null
+    }
+
+    static checkIfAllFieldsNotNull(List<InvoiceEntry> invoiceEntries) {
+        for (entry in invoiceEntries) {
+            if (!checkIfAllFieldsNotNull(entry)) {
+                return false
+            }
+        }
+        return true
+    }
+
+    static checkIfAllFieldsNotNull(Company company) {
+        return company.getCompanyId() != null && company.getTaxIdentifier() != null && company.getName() != null && checkIfAllFieldsNotNull(company.getAddress()) && company.getPensionInsurance() != null && company.getHealthInsurance() != null
+    }
+
+    static checkIfAllFieldsNotNull(Address address) {
+        return address.getAddressId() != null && address.getCity() != null && address.getPostalCode() != null && address.getStreetName() != null && address.getStreetNumber() != null
+    }
+
+    static checkIfAllFieldsNotNull(Car car) {
+        return car.getCarId() != null && car.getRegistrationNumber() != null && car.isPersonalUsage() != null
     }
 }

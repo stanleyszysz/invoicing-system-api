@@ -73,6 +73,18 @@ class InvoiceRepositoryTest extends Specification {
         return invoiceRepository.save(invoice)
     }
 
+    def "testSaveId"() {
+        when:
+        def invoice = saveInvoice()
+        def invoiceToTest = invoiceRepository.findById(invoice.getInvoiceId())
+        invoiceToTest.get().setNumber("FA/1000")
+        def savedInvoice = invoiceRepository.save(invoiceToTest.get())
+
+        then:
+        invoiceToTest.get().getInvoiceId() == savedInvoice.getInvoiceId()
+
+    }
+
     def "save"() {
         when:
         saveInvoice()

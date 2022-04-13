@@ -7,9 +7,12 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.fc.invoicing.dto.InvoiceDto;
+import pl.fc.invoicing.dto.InvoiceToSaveDto;
 import pl.fc.invoicing.dto.mappers.InvoiceMapper;
 import pl.fc.invoicing.exceptions.handlers.IdNotFoundException;
+import pl.fc.invoicing.model.Company;
 import pl.fc.invoicing.model.Invoice;
+import pl.fc.invoicing.repositories.CompanyRepository;
 import pl.fc.invoicing.repositories.InvoiceRepository;
 import pl.fc.invoicing.services.InvoiceService;
 
@@ -21,11 +24,33 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private final InvoiceMapper invoiceMapper;
 
+    private final CompanyRepository companyRepository;
+
+    private Boolean checkIfCompaniesExist(String sellerTaxIdentifier, String buyerTaxIdentifier) {
+        return companyRepository.findByTaxIdentifier(sellerTaxIdentifier).isPresent() && companyRepository.findByTaxIdentifier(buyerTaxIdentifier).isPresent();
+    }
+
     @Override
-    public InvoiceDto save(InvoiceDto invoiceDto) {
-        Invoice invoiceModel = invoiceMapper.toEntity(invoiceDto);
-        invoiceModel.updateRelations();
-        Invoice savedInvoice = invoiceRepository.save(invoiceModel);
+    public InvoiceDto save(InvoiceToSaveDto invoiceDto) {
+        Invoice savedInvoice = null;
+        if (checkIfCompaniesExist(invoiceDto.getSellerTaxIdentifier(), invoiceDto.getBuyerTaxIdentifier())) {
+            Company companySeller = companyRepository.findByTaxIdentifier(invoiceDto.getSellerTaxIdentifier()).get(); // sprawdzic jak z optionalem??
+            Company companyBuyer = companyRepository.findByTaxIdentifier(invoiceDto.getBuyerTaxIdentifier()).get();
+            InvoiceDto invoiceDto2 = new InvoiceDto();
+            invoiceDto2.setNumber(invoiceDto.getNumber());
+            invoiceDto2.setDateAt(invoiceDto.getDateAt());
+            invoiceDto2.setSeller(companySeller);
+            System.out.println("companySeller:");
+            System.out.println(companySeller);
+            invoiceDto2.setBuyer(companyBuyer);
+            invoiceDto2.setEntries(invoiceDto.getEntries());
+            Invoice invoiceModel = invoiceMapper.toEntity(invoiceDto2);
+            invoiceModel.updateRelations();
+            savedInvoice = invoiceRepository.save(invoiceModel);
+            // return invoiceMapper.toDto(savedInvoice);
+        } else {
+            return null; // throw Exception
+        }
         return invoiceMapper.toDto(savedInvoice);
     }
 
@@ -54,12 +79,22 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public InvoiceDto update(UUID id, InvoiceDto updatedInvoice) {
+    public InvoiceDto update(UUID id, InvoiceToSaveDto invoiceToSaveDto) {
         if (invoiceRepository.findById(id).isPresent()) {
-            Invoice invoice = invoiceMapper.toEntity(updatedInvoice);
-            invoice.updateRelations();
-            invoiceRepository.save(invoice);
-            return updatedInvoice;
+            Invoice invoiceToUpdate = invoiceRepository.findById(id).get();
+            Company companySeller = companyRepository.findByTaxIdentifier(invoiceToSaveDto.getSellerTaxIdentifier()).get();
+            Company companyBuyer = companyRepository.findByTaxIdentifier(invoiceToSaveDto.getBuyerTaxIdentifier()).get();
+            // InvoiceDto invoiceDto2 = new InvoiceDto();
+            invoiceToUpdate.setNumber(invoiceToSaveDto.getNumber());
+            invoiceToUpdate.setDateAt(invoiceToSaveDto.getDateAt());
+            invoiceToUpdate.setSeller(companySeller);
+            invoiceToUpdate.setBuyer(companyBuyer);
+            invoiceToUpdate.setEntries(invoiceToSaveDto.getEntries());
+            // Invoice invoice = invoiceMapper.toEntity(invoiceDto2);
+            // Invoice invoice = invoiceMapper.toEntity(invoiceDto2);
+            invoiceToUpdate.updateRelations();
+            Invoice updatedInvoice = invoiceRepository.save(invoiceToUpdate);
+            return invoiceMapper.toDto(updatedInvoice);
         } else {
             throw new IdNotFoundException("Invoice id: " + id + " not found.");
         }

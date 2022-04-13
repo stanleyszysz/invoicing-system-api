@@ -13,12 +13,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import pl.fc.invoicing.dto.InvoiceDto;
 import pl.fc.invoicing.dto.InvoiceListDto;
+import pl.fc.invoicing.dto.InvoiceToSaveDto;
 
 public interface InvoiceControllerApi {
 
     @PostMapping
     @Operation(summary = "Save invoice", description = "Save new invoice")
-    ResponseEntity<InvoiceDto> save(@RequestBody InvoiceDto invoice);
+    ResponseEntity<InvoiceDto> save(@RequestBody InvoiceToSaveDto invoice);
 
     @GetMapping(path = "/{id}")
     @Operation(summary = "Get invoice by id", description = "Get invoice selected by id")
@@ -30,7 +31,7 @@ public interface InvoiceControllerApi {
 
     @PatchMapping(path = "/{id}")
     @Operation(summary = "Update invoice", description = "Update invoice selected by id")
-    ResponseEntity<InvoiceDto> update(@PathVariable UUID id, @RequestBody InvoiceDto updatedInvoice);
+    ResponseEntity<InvoiceDto> update(@PathVariable UUID id, @RequestBody InvoiceToSaveDto updatedInvoice);
 
     @DeleteMapping(path = "/{id}")
     @Operation(summary = "Delete invoice", description = "Delete invoice selected by id")
